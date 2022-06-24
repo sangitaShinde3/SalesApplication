@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<body>
+
+    <div ng-app="myApp" ng-controller="myCtrl">
+
+        Selling Price : $  <input type="number" value="200" ng-model="sales.sellingPrice"><br>
+
+        <div class="row">
+            <div class="col-md-2">
+                <b>Discount Type</b> <br>
+                <input type="radio" value="0" name="discountType" ng-model="sales.discountType" checked> Doller ($)
+                <br>
+                <input type="radio" value="1" name="discountType" ng-model="sales.discountType"> Percentage (%)
+            </div>
+
+
+            <div class="col-md-2">
+                <b>Discount Amount</b> <br>
+                <input type="number" ng-model="sales.discountAmount"><br>
+            </div>
+
+            <div class="col-md-2">
+                <b>Event Price</b> <br>
+                <input type="number" ng-model="sales.eventPrice" disabled><br>
+            </div>
+
+            <div class="col-md-2">
+                <b>Start Date</b> <br>
+                <input type="date" id="startDateID" name="startDate" ng-model="sales.startDate">
+            </div>
+
+            <div class="col-md-2">
+                <b>End Date</b> <br>
+                <input type="date" id="endDateID" name="endDate" ng-model="sales.endDate">
+            </div>
+
+        </div>
+        <div class="row">
+
+            <input class="btn btn-primary" type="button" id="saveBtn" value="Save" ng-click="saveSalesData()">
+            <input class="btn btn-primary" type="button" id="saveBtn" value="Clear" ng-click="clearData()">
+        </div>
+    </div>
+
+    <script>
+        var app = angular.module('myApp', []);
+        app.controller('myCtrl', function ($scope) {
+            $scope.sales.eventPrice = 0;
+
+            $scope.saveSalesData = function () {
+                $scope.sales.eventPrice = 0;
+                $scope.sales.sellingPrice = 0;
+                $scope.sales.discountAmount = 0;
+
+            }
+
+            $scope.saveSalesData = function () {
+
+                if ($scope.sales.discountType == 0) {
+                    $scope.sales.eventPrice = $scope.sales.sellingPrice - $scope.sales.discountAmount;
+
+                }
+                else {
+                    $scope.sales.eventPrice = ($scope.sales.discountAmount / 100) * $scope.sales.sellingPrice;
+                }
+
+
+                $http.post('/api/Sales/SaveSalesData/', JSON.stringify($scope.sales)).then(function (response) {
+
+                    if (response.data)
+                        $scope.msg = "Sales data saved";
+                }, function (response) {
+                    $scope.msg = "Error";
+                });
+
+            }
+        });
+    </script>
+
+</body>
+</html>
